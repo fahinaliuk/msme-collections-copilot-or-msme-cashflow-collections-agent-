@@ -1,0 +1,3 @@
+Customer: Ramesh Hardware | Invoice INV-101 | invoice date 2026-04-01 | due date 2026-04-20 | amount Rs. 75000 | paid Rs. 25000 | phone +919811112222
+Party: Kavya Textiles | Bill INV-102 | invoice date 2026-03-10 | due date 2026-04-10 | total Rs. 125000 | paid Rs. 0 | phone +919822223333
+Client: Noor Packaging | Invoice INV-103 | invoice date 2026-05-01 | due date 2026-05-15 | invoice value Rs. 45000 | received Rs. 10000 | phone +919833334444

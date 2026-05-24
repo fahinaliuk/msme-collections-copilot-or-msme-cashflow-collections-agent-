@@ -1,0 +1,27 @@
+__pycache__/
+*.py[cod]
+.DS_Store
+
+# Secrets & local config — never commit
+.env
+.env.local
+.env.*.local
+
+# Python
+.venv/
+venv/
+
+# Database (local SQLite)
+*.db
+msme_agent.db
+
+# Node / Next.js
+node_modules/
+frontend/.next/
+frontend/out/
+npm-debug.log*
+
+# IDE
+.idea/
+.vscode/
+*.swp

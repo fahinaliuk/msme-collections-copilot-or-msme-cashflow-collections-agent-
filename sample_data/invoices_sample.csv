@@ -1,0 +1,7 @@
+invoice_id,customer_name,invoice_date,due_date,invoice_amount,amount_paid,status,customer_phone
+INV-001,Priya Sharma,2025-03-15,2025-04-15,45000.00,45000.00,Paid,+919876543210
+INV-002,Rajesh Traders,2025-02-01,2025-03-01,120000.00,50000.00,Partially Paid,+919812345678
+INV-003,Anita Exports,2025-01-10,2025-02-10,85000.00,0.00,Unpaid,+919988776655
+INV-004,Mehta & Sons,2025-03-01,2025-04-01,200000.00,0.00,Unpaid,+919900112233
+INV-005,Anita Exports,2025-02-20,2025-03-20,35000.00,0.00,Unpaid,+919988776655
+INV-006,Rajesh Traders,2025-04-01,2025-05-01,60000.00,10000.00,Partially Paid,+919812345678
