@@ -85,7 +85,6 @@ The backend defines portable schemas operating seamlessly across SQLite and Post
 
 Create a `.env` file in the project root. The backend will load variables using Pydantic Settings:
 Copy `.env.example` to `.env` and adjust values. OpenAI is optional (templates used for reminders and heuristic extraction when the key is absent).
-*Note: SQLite defaults to `msme_agent.db` in the project root. If you see schema errors after an upgrade, delete that file and restart the API (or run the seed script again).*
 
 ### Option A: Local Run (No Docker)
 

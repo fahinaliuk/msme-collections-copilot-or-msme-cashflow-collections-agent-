@@ -1,8 +1,12 @@
 import axios from "axios";
 
-// Create Axios client with local prefix (next.config.js rewrites this to localhost:8000/api in development)
+// API base URL:
+//   NEXT_PUBLIC_API_URL — set at build time for Vercel/Render production
+//   falls back to "" (same-origin via Next.js rewrites) for Docker/local dev
+const API_BASE = process.env.NEXT_PUBLIC_API_URL || "";
+
 const api = axios.create({
-  baseURL: typeof window !== "undefined" ? "" : "http://localhost:8000",
+  baseURL: API_BASE,
   headers: {
     "Content-Type": "application/json",
   },

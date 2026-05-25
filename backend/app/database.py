@@ -1,11 +1,19 @@
-"""Async SQLAlchemy engine, session factory, and base model."""
+"""Async SQLAlchemy engine, session factory, and base model.
+
+Supports both SQLite (local dev) and PostgreSQL (production) with
+connection pooling for PostgreSQL.
+"""
 
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
 from sqlalchemy.orm import DeclarativeBase
 
 from backend.app.config import settings
 
-engine = create_async_engine(settings.DATABASE_URL, echo=settings.DEBUG, future=True)
+engine = create_async_engine(
+    settings.DATABASE_URL,
+    **settings.db_pool_kwargs,
+    echo=settings.DEBUG,
+)
 
 async_session_factory = async_sessionmaker(
     engine,

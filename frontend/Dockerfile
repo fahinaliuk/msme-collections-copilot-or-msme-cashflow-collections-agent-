@@ -1,20 +1,23 @@
 # Multi-stage build for Next.js client
-FROM node:26-alpine AS builder
+FROM node:22-alpine AS builder
 
 WORKDIR /app
 
 # Next.js bakes rewrites at build time — set internal API URL for Docker network
 ARG API_URL=http://backend:8000
 ENV API_URL=${API_URL}
+# When NEXT_PUBLIC_API_URL is set, axios uses it directly (Vercel/Render mode)
+ARG NEXT_PUBLIC_API_URL
+ENV NEXT_PUBLIC_API_URL=${NEXT_PUBLIC_API_URL}
 
 COPY package*.json ./
-RUN npm install
+RUN npm ci --only=production --ignore-scripts
 
 COPY . .
 RUN npm run build
 
 # Runner stage
-FROM node:26-alpine AS runner
+FROM node:22-alpine AS runner
 
 WORKDIR /app
 

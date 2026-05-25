@@ -1,13 +1,14 @@
 """Authentication API routes."""
 
 from datetime import timedelta
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, Request, status
 from fastapi.security import OAuth2PasswordRequestForm
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
 
 from backend.app.database import get_db
 from backend.app.models.user import User
+from backend.app.utils.rate_limiter import limiter
 from backend.app.schemas import Token, UserOut, UserSignup
 from backend.app.utils.auth import (
     create_access_token,
@@ -20,7 +21,8 @@ router = APIRouter(prefix="/api/auth", tags=["Authentication"])
 
 
 @router.post("/signup", response_model=Token, status_code=status.HTTP_201_CREATED)
-async def signup(user_data: UserSignup, db: AsyncSession = Depends(get_db)):
+@limiter.limit("5/minute")
+async def signup(request: Request, user_data: UserSignup, db: AsyncSession = Depends(get_db)):
     """Create a new user account."""
     # Check if user already exists
     result = await db.execute(select(User).where(User.email == user_data.email))
@@ -54,7 +56,9 @@ async def signup(user_data: UserSignup, db: AsyncSession = Depends(get_db)):
 
 
 @router.post("/login", response_model=Token)
+@limiter.limit("10/minute")
 async def login(
+    request: Request,
     form_data: OAuth2PasswordRequestForm = Depends(),
     db: AsyncSession = Depends(get_db),
 ):
