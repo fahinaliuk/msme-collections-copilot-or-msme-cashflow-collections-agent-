@@ -1,20 +1,9 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
-  "git": {
-    "deploymentEnabled": {
-      "main": true
-    }
-  },
   "buildCommand": "npm run build",
   "outputDirectory": ".next",
   "devCommand": "npm run dev",
   "installCommand": "npm install",
   "framework": "nextjs",
-  "ignoreCommand": "git diff --quiet HEAD^ HEAD -- ./",
-  "environment": {
-    "NEXT_PUBLIC_API_URL": {
-      "description": "Public URL of the FastAPI backend (e.g. https://msme-copilot-api.onrender.com)",
-      "required": false
-    }
-  }
+  "ignoreCommand": "git diff --quiet HEAD^ HEAD -- ./"
 }
