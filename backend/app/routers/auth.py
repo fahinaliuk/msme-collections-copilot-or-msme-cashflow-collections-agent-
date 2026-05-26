@@ -1,7 +1,7 @@
 """Authentication API routes."""
 
 from datetime import timedelta
-from fastapi import APIRouter, Depends, HTTPException, Request, status
+from fastapi import APIRouter, Depends, HTTPException, Request, Response, status
 from fastapi.security import OAuth2PasswordRequestForm
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
@@ -18,6 +18,20 @@ from backend.app.utils.auth import (
 )
 
 router = APIRouter(prefix="/api/auth", tags=["Authentication"])
+
+
+# Explicit OPTIONS handlers for CORS preflight. slowapi's @limiter.limit
+# decorator can interfere with browser OPTIONS preflight requests, causing
+# the server to return 400 instead of allowing CORSMiddleware to handle
+# them. These handlers let the browser complete the CORS handshake so that
+# the CORSMiddleware's send_wrapper can attach the Access-Control-Allow-Origin
+# header matching the request origin.
+@router.options("/signup")
+@router.options("/login")
+@router.options("/me")
+async def auth_options():
+    """Allow CORS preflight to complete when CORSMiddleware is bypassed."""
+    return Response(status_code=200)
 
 
 @router.post("/signup", response_model=Token, status_code=status.HTTP_201_CREATED)
