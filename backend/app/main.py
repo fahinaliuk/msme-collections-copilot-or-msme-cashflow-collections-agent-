@@ -13,7 +13,7 @@ from slowapi.middleware import SlowAPIMiddleware
 
 from backend.app.config import settings, validate_production_settings
 from backend.app.database import init_db
-from backend.app.routers import auth, dashboard, disputes, invoices, promises, reminders
+from backend.app.routers import auth, dashboard, disputes, invoices, promises, reminders, worklist
 from backend.app.utils.rate_limiter import limiter
 
 # ---------------------------------------------------------------------------
@@ -116,6 +116,7 @@ app.include_router(auth.router)
 app.include_router(invoices.router)
 app.include_router(dashboard.router)
 app.include_router(reminders.router)
+app.include_router(worklist.router)
 
 
 # ---------------------------------------------------------------------------

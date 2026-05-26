@@ -16,7 +16,9 @@ import {
   Menu,
   X,
   Handshake,
-  ShieldAlert
+  ShieldAlert,
+  ClipboardList,
+  Clock
 } from "lucide-react";
 
 export default function Navbar() {
@@ -48,10 +50,12 @@ export default function Navbar() {
 
   const navItems = [
     { name: "Dashboard", href: "/dashboard", icon: BarChart3 },
+    { name: "Today's Worklist", href: "/worklist", icon: ClipboardList },
     { name: "Ingest Invoices", href: "/upload", icon: UploadCloud },
     { name: "Promises to Pay", href: "/promises", icon: Handshake },
     { name: "Disputes", href: "/disputes", icon: ShieldAlert },
     { name: "Collections Priority", href: "/collections", icon: Users },
+    { name: "Timeline", href: "/timeline", icon: Clock },
     { name: "All Invoices", href: "/invoices", icon: FileSpreadsheet },
   ];
 

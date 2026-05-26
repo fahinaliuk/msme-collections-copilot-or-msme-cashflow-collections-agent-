@@ -151,4 +151,35 @@ export const remindersAPI = {
   },
 };
 
+export const worklistAPI = {
+  getWorklist: async (params?: {
+    action_type?: string;
+    min_urgency?: number;
+    risk_tier?: string;
+    limit?: number;
+  }) => {
+    const response = await api.get("/api/worklist", { params });
+    return response.data;
+  },
+  logCall: async (data: {
+    customer_name: string;
+    description: string;
+    phone_number?: string;
+    duration_seconds?: number;
+    notes?: string;
+  }) => {
+    const response = await api.post("/api/worklist/log-call", data);
+    return response.data;
+  },
+  addNote: async (data: {
+    customer_name: string;
+    title: string;
+    description: string;
+  }) => {
+    const response = await api.post("/api/worklist/add-note", data);
+    return response.data;
+  },
+};
+
 export default api;
+

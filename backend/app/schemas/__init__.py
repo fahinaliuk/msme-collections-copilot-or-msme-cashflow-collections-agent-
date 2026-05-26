@@ -23,6 +23,10 @@ from backend.app.schemas.schemas import (
     ReminderGenerateRequest,
     ReminderGenerateResponse,
     LogActionRequest,
+    WorklistItemOut,
+    WorklistFilterParams,
+    LogCallRequest,
+    AddNoteRequest,
 )
 
 __all__ = [
@@ -50,4 +54,8 @@ __all__ = [
     "ReminderGenerateRequest",
     "ReminderGenerateResponse",
     "LogActionRequest",
+    "WorklistItemOut",
+    "WorklistFilterParams",
+    "LogCallRequest",
+    "AddNoteRequest",
 ]
