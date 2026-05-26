@@ -26,6 +26,8 @@ type InvoiceRow = {
   amount_paid: number;
   status: string;
   customer_phone: string | null;
+  extraction_confidence?: number;
+  needs_review?: boolean;
   warnings?: string[];
 };
 
@@ -157,6 +159,8 @@ export default function IngestPage() {
         amount_paid: inv.amount_paid,
         status: inv.status,
         customer_phone: inv.customer_phone,
+        extraction_confidence: inv.extraction_confidence,
+        needs_review: inv.needs_review,
         warnings: inv.warnings || [],
       }));
 
@@ -217,6 +221,8 @@ export default function IngestPage() {
       amount_paid: 0,
       status: "Unpaid",
       customer_phone: "",
+      extraction_confidence: 1.0,
+      needs_review: false,
       warnings: ["Missing customer name."]
     };
     setInvoices([...invoices, newRow]);
@@ -479,6 +485,7 @@ Mehta & Sons also has invoice INV-204 for 75000 fully unpaid due 2026-05-20."
                     <th className="px-4 py-3.5 w-[130px]">Amount</th>
                     <th className="px-4 py-3.5 w-[130px]">Paid</th>
                     <th className="px-4 py-3.5 w-[140px]">Phone</th>
+                    <th className="px-4 py-3.5 w-[80px]">Score</th>
                     <th className="px-4 py-3.5">Warnings</th>
                     <th className="px-4 py-3.5 w-[60px] text-center">Delete</th>
                   </tr>
@@ -489,7 +496,11 @@ Mehta & Sons also has invoice INV-204 for 75000 fully unpaid due 2026-05-20."
                       
                       {/* Check column warnings icon */}
                       <td className="px-4 py-2.5 text-center">
-                        {inv.warnings && inv.warnings.length > 0 ? (
+                        {inv.needs_review ? (
+                          <div className="flex justify-center text-red-500" title="Needs Review!">
+                            <AlertCircle size={18} />
+                          </div>
+                        ) : inv.warnings && inv.warnings.length > 0 ? (
                           <div className="flex justify-center text-yellow-500" title="Validation Alert!">
                             <AlertTriangle size={18} />
                           </div>
@@ -571,6 +582,26 @@ Mehta & Sons also has invoice INV-204 for 75000 fully unpaid due 2026-05-20."
                         />
                       </td>
 
+                      {/* Score gauge */}
+                      <td className="px-2 py-1.5 text-center">
+                        {inv.extraction_confidence !== undefined ? (
+                          <div className="flex flex-col items-center justify-center">
+                            <div className={`px-2 py-0.5 rounded text-xs font-bold ${
+                              inv.extraction_confidence >= 0.95 ? "bg-emerald-500/10 text-emerald-600" :
+                              inv.extraction_confidence >= 0.75 ? "bg-yellow-500/10 text-yellow-600" :
+                              "bg-red-500/10 text-red-600"
+                            }`}>
+                              {(inv.extraction_confidence * 100).toFixed(0)}%
+                            </div>
+                            {inv.needs_review && (
+                              <span className="text-[9px] font-bold text-red-600 uppercase mt-0.5 leading-none">Review</span>
+                            )}
+                          </div>
+                        ) : (
+                          <span className="text-muted-foreground">-</span>
+                        )}
+                      </td>
+
                       {/* Warning tags */}
                       <td className="px-4 py-2.5 max-w-[200px] truncate">
                         {inv.warnings && inv.warnings.length > 0 ? (
@@ -614,6 +645,7 @@ Mehta & Sons also has invoice INV-204 for 75000 fully unpaid due 2026-05-20."
             <div className="flex justify-end bg-muted/10 border-t border-border px-6 py-4">
               <div className="text-right space-y-1">
                 <p className="text-xs text-muted-foreground">Total Extracted Items: <span className="font-bold text-foreground">{invoices.length}</span></p>
+                <p className="text-xs text-muted-foreground">Needs Review: <span className="font-bold text-red-500">{invoices.filter(i => i.needs_review).length}</span></p>
                 <p className="text-xs text-muted-foreground">Cumulative Outstanding Invoices: <span className="font-bold text-emerald-500">₹{invoices.reduce((sum, inv) => sum + Math.max(inv.invoice_amount - inv.amount_paid, 0), 0).toLocaleString("en-IN", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span></p>
               </div>
             </div>

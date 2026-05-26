@@ -18,7 +18,8 @@ import {
   Handshake,
   ShieldAlert,
   ClipboardList,
-  Clock
+  Clock,
+  ScanSearch
 } from "lucide-react";
 
 export default function Navbar() {
@@ -52,6 +53,7 @@ export default function Navbar() {
     { name: "Dashboard", href: "/dashboard", icon: BarChart3 },
     { name: "Today's Worklist", href: "/worklist", icon: ClipboardList },
     { name: "Ingest Invoices", href: "/upload", icon: UploadCloud },
+    { name: "Review Queue", href: "/review", icon: ScanSearch },
     { name: "Promises to Pay", href: "/promises", icon: Handshake },
     { name: "Disputes", href: "/disputes", icon: ShieldAlert },
     { name: "Collections Priority", href: "/collections", icon: Users },

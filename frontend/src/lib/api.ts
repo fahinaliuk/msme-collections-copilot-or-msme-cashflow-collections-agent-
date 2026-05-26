@@ -127,6 +127,10 @@ export const invoicesAPI = {
     const response = await api.get("/api/invoices");
     return response.data;
   },
+  getReviewQueue: async (params?: { filter_type?: string }) => {
+    const response = await api.get("/api/invoices/review-queue", { params });
+    return response.data;
+  },
 };
 
 export const dashboardAPI = {

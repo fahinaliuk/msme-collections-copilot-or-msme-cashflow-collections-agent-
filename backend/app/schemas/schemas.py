@@ -137,6 +137,8 @@ class ExtractedInvoice(BaseModel):
     amount_outstanding: Optional[float] = None
     days_overdue: Optional[int] = None
     warnings: List[str] = Field(default_factory=list)
+    extraction_confidence: float = 1.0
+    needs_review: bool = False
 
 
 class ExtractionPreviewResponse(BaseModel):
@@ -216,6 +218,24 @@ class DashboardSummaryResponse(BaseModel):
     recent_invoices: List[dict]
     broken_promises_count: int = 0
     open_disputes_count: int = 0
+    needs_review_count: int = 0
+
+
+class ReviewQueueInvoice(BaseModel):
+    id: str
+    invoice_id: str
+    customer_name: str
+    invoice_date: date
+    due_date: date
+    invoice_amount: float
+    amount_paid: float
+    outstanding_amount: float
+    status: str
+    days_overdue: int
+    customer_phone: Optional[str] = None
+    confidence_score: float
+    validation_warnings: Optional[str] = None
+    created_at: datetime
 
 
 # ==========================================

@@ -90,6 +90,28 @@ def _recommend_for_customer(
     broken_count = len(broken_promises)
     has_open_dispute = len(open_disputes) > 0
 
+    # --- Rule 0: Low-confidence invoices → verify_invoice_data ---
+    low_conf_invoices = [
+        inv for inv in all_outstanding
+        if inv.confidence_score < 0.75
+    ]
+    if low_conf_invoices:
+        return WorklistItemOut(
+            customer_id=customer_id,
+            customer_name=customer_name,
+            recommended_action="verify_invoice_data",
+            reason=f"{len(low_conf_invoices)} invoice(s) have low extraction confidence — verify data before collection.",
+            urgency_score=88,
+            affected_invoices=_build_invoice_summaries(low_conf_invoices[:5]),
+            suggested_channel="internal",
+            risk_tier=risk_tier,
+            total_outstanding=total_outstanding,
+            max_days_overdue=max_days_overdue,
+            open_dispute=has_open_dispute,
+            broken_promise=broken_count > 0,
+            pending_promise=len(pending_promises) > 0,
+        )
+
     # --- Rule 1: Open dispute → resolve_dispute ---
     if has_open_dispute:
         dispute_invoices = list({d.invoice_id for d in open_disputes if d.invoice_id})

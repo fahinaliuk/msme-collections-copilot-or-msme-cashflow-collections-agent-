@@ -196,6 +196,15 @@ async def get_dashboard_summary(
     )
     open_disputes_count = len(od_result.scalars().all())
 
+    # 9. Low-confidence invoices needing review
+    review_result = await db.execute(
+        select(func.count(Invoice.id)).where(
+            Invoice.user_id == current_user.id,
+            Invoice.confidence_score < 0.75,
+        )
+    )
+    needs_review_count = review_result.scalar() or 0
+
     return DashboardSummaryResponse(
         kpis=kpi_cards,
         aging_buckets=aging_buckets,
@@ -206,6 +215,7 @@ async def get_dashboard_summary(
         recent_invoices=recent_invoices,
         broken_promises_count=broken_promises_count,
         open_disputes_count=open_disputes_count,
+        needs_review_count=needs_review_count,
     )
 
 

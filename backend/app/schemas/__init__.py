@@ -27,6 +27,7 @@ from backend.app.schemas.schemas import (
     WorklistFilterParams,
     LogCallRequest,
     AddNoteRequest,
+    ReviewQueueInvoice,
 )
 
 __all__ = [
@@ -58,4 +59,5 @@ __all__ = [
     "WorklistFilterParams",
     "LogCallRequest",
     "AddNoteRequest",
+    "ReviewQueueInvoice",
 ]

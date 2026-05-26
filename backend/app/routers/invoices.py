@@ -12,7 +12,9 @@ from backend.app.database import get_db
 from backend.app.models.invoice import Invoice
 from backend.app.models.upload import Upload
 from backend.app.models.user import User
-from backend.app.schemas import ConfirmInvoicesRequest, ExtractedInvoice, ExtractionPreviewResponse
+from backend.app.schemas import ConfirmInvoicesRequest, ExtractedInvoice, ExtractionPreviewResponse, ReviewQueueInvoice
+from backend.app.services.communication import add_timeline_entry
+from backend.app.services.confidence import compute_confidence, needs_review as check_needs_review
 from backend.app.services.customers import refresh_customer_profiles
 from backend.app.services.extraction import extract_invoice_rows_from_text
 from backend.app.services.spreadsheet import parse_spreadsheet
@@ -67,10 +69,15 @@ def validate_extracted_invoice(inv: dict, existing_ids: set) -> List[str]:
     return warnings
 
 
-def _rows_to_schemas(rows: list[dict], existing_ids: set) -> list[ExtractedInvoice]:
+def _rows_to_schemas(rows: list[dict], existing_ids: set, extraction_method: str = "deterministic") -> list[ExtractedInvoice]:
     schemas: list[ExtractedInvoice] = []
     for row in rows:
+        # Compute confidence score deterministically
+        confidence, confidence_warnings = compute_confidence(row, extraction_method, existing_ids)
+        # Also run the existing validation for backward-compatible warnings
         row_warnings = validate_extracted_invoice(row, existing_ids)
+        # Merge warnings (deduplicate)
+        all_warnings = list(dict.fromkeys(confidence_warnings + row_warnings))
 
         parsed_inv_date = date.today()
         parsed_due_date = date.today()
@@ -102,7 +109,9 @@ def _rows_to_schemas(rows: list[dict], existing_ids: set) -> list[ExtractedInvoi
                 customer_phone=row.get("customer_phone"),
                 amount_outstanding=outstanding,
                 days_overdue=days_overdue,
-                warnings=row_warnings,
+                warnings=all_warnings,
+                extraction_confidence=confidence,
+                needs_review=check_needs_review(confidence),
             )
         )
     return schemas
@@ -191,7 +200,7 @@ async def upload_invoice(
         file_size_bytes=file_size,
         classification=classification,
         extraction_method=extraction_method,
-        invoices=_rows_to_schemas(extracted_rows, existing_ids),
+        invoices=_rows_to_schemas(extracted_rows, existing_ids, extraction_method),
         warnings=global_warnings,
     )
 
@@ -245,9 +254,11 @@ async def confirm_invoices(
                 Invoice.invoice_id == inv.invoice_id,
             )
         )
-        warnings_list: list[str] = []
-        if dup_q.scalars().first():
-            warnings_list.append("Duplicate invoice ID already exists in database.")
+        all_warnings = list(warnings_list)
+        if inv.warnings:
+            all_warnings.extend(inv.warnings)
+
+        conf_score = getattr(inv, 'extraction_confidence', 1.0)
 
         db.add(
             Invoice(
@@ -263,9 +274,20 @@ async def confirm_invoices(
                 status=inv.status,
                 days_overdue=days_overdue,
                 customer_phone=inv.customer_phone,
-                validation_warnings=", ".join(warnings_list) if warnings_list else None,
+                confidence_score=conf_score,
+                validation_warnings=", ".join(all_warnings) if all_warnings else None,
             )
         )
+
+        # Log timeline event for invoices needing review
+        if check_needs_review(conf_score):
+            await add_timeline_entry(
+                db,
+                user_id=current_user.id,
+                customer_name=inv.customer_name,
+                event_type="invoice_flagged_for_review",
+                description=f"Invoice {inv.invoice_id} flagged for review (confidence: {conf_score:.0%}).",
+            )
 
     await db.flush()
     await refresh_customer_profiles(db, current_user.id)
@@ -302,7 +324,62 @@ async def get_all_invoices(
             "status": i.status,
             "days_overdue": i.days_overdue,
             "customer_phone": i.customer_phone,
+            "confidence_score": i.confidence_score,
+            "validation_warnings": i.validation_warnings,
             "created_at": i.created_at.isoformat(),
         }
+        for i in invoices
+    ]
+
+
+@router.get("/review-queue", response_model=List[ReviewQueueInvoice])
+async def get_review_queue(
+    filter_type: Optional[str] = None,
+    current_user: User = Depends(get_current_user),
+    db: AsyncSession = Depends(get_db),
+):
+    """Fetch invoices for the review queue with optional filters.
+
+    filter_type options:
+    - needs_review: confidence_score < 0.75
+    - high_confidence: confidence_score >= 0.95
+    - duplicate: validation_warnings contains 'Duplicate'
+    - invalid_amount: validation_warnings contains 'amount'
+    - (default/None): all invoices with confidence_score < 0.95, sorted by confidence asc
+    """
+    query = select(Invoice).where(Invoice.user_id == current_user.id)
+
+    if filter_type == "needs_review":
+        query = query.where(Invoice.confidence_score < 0.75)
+    elif filter_type == "high_confidence":
+        query = query.where(Invoice.confidence_score >= 0.95)
+    elif filter_type == "duplicate":
+        query = query.where(Invoice.validation_warnings.ilike("%duplicate%"))
+    elif filter_type == "invalid_amount":
+        query = query.where(Invoice.validation_warnings.ilike("%amount%"))
+    else:
+        query = query.where(Invoice.confidence_score < 0.95)
+
+    query = query.order_by(Invoice.confidence_score.asc())
+    result = await db.execute(query)
+    invoices = result.scalars().all()
+
+    return [
+        ReviewQueueInvoice(
+            id=str(i.id),
+            invoice_id=i.invoice_id,
+            customer_name=i.customer_name,
+            invoice_date=i.invoice_date,
+            due_date=i.due_date,
+            invoice_amount=i.invoice_amount,
+            amount_paid=i.amount_paid,
+            outstanding_amount=i.outstanding_amount,
+            status=i.status,
+            days_overdue=i.days_overdue,
+            customer_phone=i.customer_phone,
+            confidence_score=i.confidence_score,
+            validation_warnings=i.validation_warnings,
+            created_at=i.created_at,
+        )
         for i in invoices
     ]
