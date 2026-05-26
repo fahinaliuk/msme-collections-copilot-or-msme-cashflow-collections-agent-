@@ -219,6 +219,51 @@ class DashboardSummaryResponse(BaseModel):
 
 
 # ==========================================
+# WORKLIST / NEXT-BEST-ACTION SCHEMAS
+# ==========================================
+
+class WorklistItemOut(BaseModel):
+    customer_id: Optional[str] = None
+    customer_name: str
+    recommended_action: str  # one of ACTION_TYPES
+    reason: str
+    urgency_score: int  # 1-100
+    affected_invoices: List[dict] = Field(default_factory=list)
+    suggested_channel: str
+    risk_tier: str = "low"
+    total_outstanding: float = 0.0
+    max_days_overdue: int = 0
+    open_dispute: bool = False
+    broken_promise: bool = False
+    pending_promise: bool = False
+
+
+class WorklistFilterParams(BaseModel):
+    action_type: Optional[str] = None
+    min_urgency: Optional[int] = None
+    risk_tier: Optional[str] = None
+    limit: int = 50
+
+
+# ==========================================
+# TIMELINE CALL / NOTE SCHEMAS
+# ==========================================
+
+class LogCallRequest(BaseModel):
+    customer_name: str = Field(..., min_length=1)
+    description: str = Field(..., min_length=1)
+    phone_number: Optional[str] = None
+    duration_seconds: Optional[int] = None
+    notes: Optional[str] = None
+
+
+class AddNoteRequest(BaseModel):
+    customer_name: str = Field(..., min_length=1)
+    title: str = Field(..., min_length=1)
+    description: str = Field(..., min_length=1)
+
+
+# ==========================================
 # WHATSAPP REMINDER SCHEMAS
 # ==========================================
 
