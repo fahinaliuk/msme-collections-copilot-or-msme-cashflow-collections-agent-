@@ -59,6 +59,57 @@ export const authAPI = {
   },
 };
 
+export const promisesAPI = {
+  list: async (params?: { status?: string; customer_name?: string }) => {
+    const response = await api.get("/api/promises", { params });
+    return response.data;
+  },
+  create: async (data: {
+    customer_name: string;
+    invoice_id?: string;
+    promised_amount: number;
+    promised_date: string;
+    notes?: string;
+  }) => {
+    const response = await api.post("/api/promises", data);
+    return response.data;
+  },
+  update: async (id: string, data: { status: string; notes?: string }) => {
+    const response = await api.patch(`/api/promises/${id}`, data);
+    return response.data;
+  },
+};
+
+export const disputesAPI = {
+  list: async (params?: { status?: string; customer_name?: string }) => {
+    const response = await api.get("/api/disputes", { params });
+    return response.data;
+  },
+  create: async (data: {
+    customer_name: string;
+    invoice_id?: string;
+    reason: string;
+    description?: string;
+    disputed_amount?: number;
+  }) => {
+    const response = await api.post("/api/disputes", data);
+    return response.data;
+  },
+  update: async (id: string, data: { status: string; resolution_notes?: string }) => {
+    const response = await api.patch(`/api/disputes/${id}`, data);
+    return response.data;
+  },
+};
+
+export const timelineAPI = {
+  list: async (customer_name: string, limit?: number) => {
+    const response = await api.get(`/api/collections/customers/${encodeURIComponent(customer_name)}/timeline`, {
+      params: { limit },
+    });
+    return response.data;
+  },
+};
+
 export const invoicesAPI = {
   upload: async (formData: FormData) => {
     const response = await api.post("/api/invoices/upload", formData, {

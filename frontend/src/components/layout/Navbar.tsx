@@ -4,17 +4,19 @@ import React, { useEffect, useState } from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useTheme } from "@/app/providers";
-import { 
-  BarChart3, 
-  UploadCloud, 
-  Users, 
-  FileSpreadsheet, 
-  Sun, 
-  Moon, 
+import {
+  BarChart3,
+  UploadCloud,
+  Users,
+  FileSpreadsheet,
+  Sun,
+  Moon,
   LogOut,
   Building2,
   Menu,
-  X
+  X,
+  Handshake,
+  ShieldAlert
 } from "lucide-react";
 
 export default function Navbar() {
@@ -47,6 +49,8 @@ export default function Navbar() {
   const navItems = [
     { name: "Dashboard", href: "/dashboard", icon: BarChart3 },
     { name: "Ingest Invoices", href: "/upload", icon: UploadCloud },
+    { name: "Promises to Pay", href: "/promises", icon: Handshake },
+    { name: "Disputes", href: "/disputes", icon: ShieldAlert },
     { name: "Collections Priority", href: "/collections", icon: Users },
     { name: "All Invoices", href: "/invoices", icon: FileSpreadsheet },
   ];

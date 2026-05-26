@@ -10,7 +10,9 @@ from sqlalchemy.future import select
 
 from backend.app.database import get_db
 from backend.app.models.customer_profile import CustomerProfile
+from backend.app.models.dispute import Dispute
 from backend.app.models.invoice import Invoice
+from backend.app.models.promise_to_pay import PromiseToPay
 from backend.app.models.user import User
 from backend.app.schemas import (
     AgingBucket,
@@ -177,6 +179,23 @@ async def get_dashboard_summary(
         for i in sorted(all_invoices, key=lambda x: x.created_at, reverse=True)[:5]
     ]
 
+    # 8. Broken promises and open disputes counts
+    bp_result = await db.execute(
+        select(PromiseToPay).where(
+            PromiseToPay.user_id == current_user.id,
+            PromiseToPay.status == "broken",
+        )
+    )
+    broken_promises_count = len(bp_result.scalars().all())
+
+    od_result = await db.execute(
+        select(Dispute).where(
+            Dispute.user_id == current_user.id,
+            Dispute.status.in_(["open", "under_review"]),
+        )
+    )
+    open_disputes_count = len(od_result.scalars().all())
+
     return DashboardSummaryResponse(
         kpis=kpi_cards,
         aging_buckets=aging_buckets,
@@ -185,6 +204,8 @@ async def get_dashboard_summary(
         top_priorities=top_priorities,
         high_risk_accounts=high_risk_accounts,
         recent_invoices=recent_invoices,
+        broken_promises_count=broken_promises_count,
+        open_disputes_count=open_disputes_count,
     )
 
 
@@ -200,7 +221,28 @@ async def get_all_priority_customers(
         .order_by(CustomerProfile.risk_score.desc())
     )
     profiles = cp_result.scalars().all()
-    
+
+    # Pre-fetch all disputes and broken promises for this user
+    dispute_result = await db.execute(
+        select(Dispute).where(
+            Dispute.user_id == current_user.id,
+            Dispute.status.in_(["open", "under_review"]),
+        )
+    )
+    open_disputes: dict[str, int] = {}
+    for d in dispute_result.scalars().all():
+        open_disputes[d.customer_name] = open_disputes.get(d.customer_name, 0) + 1
+
+    promise_result = await db.execute(
+        select(PromiseToPay).where(
+            PromiseToPay.user_id == current_user.id,
+            PromiseToPay.status == "broken",
+        )
+    )
+    broken_promises: dict[str, int] = {}
+    for p in promise_result.scalars().all():
+        broken_promises[p.customer_name] = broken_promises.get(p.customer_name, 0) + 1
+
     return [
         CustomerPriorityItem(
             customer_name=p.customer_name,
@@ -210,6 +252,8 @@ async def get_all_priority_customers(
             invoice_count=p.total_invoices,
             priority_score=p.risk_score,
             risk_tier=p.risk_tier,
+            open_disputes_count=open_disputes.get(p.customer_name, 0),
+            broken_promises_count=broken_promises.get(p.customer_name, 0),
         )
         for p in profiles
     ]

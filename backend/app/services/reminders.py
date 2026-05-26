@@ -19,12 +19,17 @@ class ReminderContext:
     oldest_due_date: str
     business_name: str
     tone: str
+    open_dispute_count: int = 0
+    broken_promise_count: int = 0
 
 
-def _tone_label(tone: str, max_days_overdue: int) -> str:
+def _tone_label(tone: str, max_days_overdue: int, open_dispute_count: int = 0, broken_promise_count: int = 0) -> str:
     normalized = (tone or "polite").strip().lower()
     if normalized in {"polite", "firm", "urgent"}:
         return normalized
+    # Escalate tone if there are broken promises or open disputes
+    if broken_promise_count > 0 or open_dispute_count > 0:
+        return "firm" if max_days_overdue <= 30 else "urgent"
     if max_days_overdue <= 15:
         return "polite"
     if max_days_overdue <= 45:
@@ -37,11 +42,19 @@ def _template_messages(ctx: ReminderContext) -> List[str]:
     amount = f"₹{ctx.total_overdue_amount:,.2f}"
     business = ctx.business_name
 
+    context_lines: list[str] = []
+    if ctx.open_dispute_count > 0:
+        context_lines.append(f"Open disputes: {ctx.open_dispute_count}")
+    if ctx.broken_promise_count > 0:
+        context_lines.append(f"Broken promises: {ctx.broken_promise_count}")
+    context_str = f" ({'; '.join(context_lines)})" if context_lines else ""
+
     if ctx.tone == "polite":
         return [
             (
                 f"Hi {name}, this is a friendly reminder from {business}. "
-                f"You have an outstanding balance of {amount} across {ctx.number_of_invoices} invoice(s). "
+                f"You have an outstanding balance of {amount} across {ctx.number_of_invoices} invoice(s)."
+                f"{context_str} "
                 f"We would appreciate payment at your earliest convenience. Thank you."
             ),
             (
@@ -54,7 +67,8 @@ def _template_messages(ctx: ReminderContext) -> List[str]:
         return [
             (
                 f"Dear {name}, your account with {business} shows an overdue balance of {amount} "
-                f"(oldest due: {ctx.oldest_due_date}). Please arrange payment soon or contact us to discuss."
+                f"(oldest due: {ctx.oldest_due_date}).{context_str} "
+                f"Please arrange payment soon or contact us to discuss."
             ),
             (
                 f"Hi {name}, this is a follow-up from {business} on your overdue amount of {amount}. "
@@ -65,7 +79,8 @@ def _template_messages(ctx: ReminderContext) -> List[str]:
     return [
         (
             f"Dear {name}, urgent reminder: {amount} remains overdue with {business} "
-            f"({ctx.max_days_overdue} days past due). Please pay today to avoid further escalation."
+            f"({ctx.max_days_overdue} days past due).{context_str} "
+            f"Please pay today to avoid further escalation."
         ),
         (
             f"Hi {name}, your overdue balance of {amount} with {business} needs immediate attention. "
@@ -93,6 +108,8 @@ def generate_whatsapp_messages(
     oldest_due_date: str,
     business_name: str,
     tone: str = "polite",
+    open_dispute_count: int = 0,
+    broken_promise_count: int = 0,
 ) -> List[str]:
     """Return two professional WhatsApp reminder variants."""
     ctx = ReminderContext(
@@ -102,7 +119,9 @@ def generate_whatsapp_messages(
         number_of_invoices=number_of_invoices,
         oldest_due_date=oldest_due_date,
         business_name=business_name or "Our Business",
-        tone=_tone_label(tone, max_days_overdue),
+        tone=_tone_label(tone, max_days_overdue, open_dispute_count, broken_promise_count),
+        open_dispute_count=open_dispute_count,
+        broken_promise_count=broken_promise_count,
     )
 
     # Always have reliable template output; try LLM only when configured.

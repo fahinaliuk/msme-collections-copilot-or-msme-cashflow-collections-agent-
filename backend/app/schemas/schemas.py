@@ -2,7 +2,7 @@
 
 import uuid
 from datetime import date, datetime
-from typing import List, Optional
+from typing import Any, Dict, List, Optional
 from pydantic import BaseModel, EmailStr, Field
 
 
@@ -36,6 +36,87 @@ class Token(BaseModel):
     access_token: str
     token_type: str
     user: UserOut
+
+
+# ==========================================
+# PROMISE-TO-PAY SCHEMAS
+# ==========================================
+
+class PromiseToPayCreate(BaseModel):
+    customer_name: str = Field(..., min_length=1)
+    invoice_id: Optional[str] = None
+    promised_amount: float = Field(..., gt=0)
+    promised_date: date
+    notes: Optional[str] = None
+
+
+class PromiseToPayUpdate(BaseModel):
+    status: str = Field(..., pattern=r"^(pending|fulfilled|broken|cancelled)$")
+    notes: Optional[str] = None
+
+
+class PromiseToPayOut(BaseModel):
+    id: uuid.UUID
+    customer_name: str
+    invoice_id: Optional[str]
+    promised_amount: float
+    promised_date: date
+    status: str
+    notes: Optional[str]
+    created_at: datetime
+    updated_at: datetime
+
+    model_config = {"from_attributes": True}
+
+
+# ==========================================
+# DISPUTE SCHEMAS
+# ==========================================
+
+class DisputeCreate(BaseModel):
+    customer_name: str = Field(..., min_length=1)
+    invoice_id: Optional[str] = None
+    reason: str = Field(
+        ...,
+        pattern=r"^(pricing_issue|duplicate_invoice|goods_not_delivered|payment_already_done|wrong_customer_details|other)$",
+    )
+    description: Optional[str] = None
+    disputed_amount: float = Field(default=0.0, ge=0)
+
+
+class DisputeUpdate(BaseModel):
+    status: str = Field(..., pattern=r"^(open|under_review|resolved|rejected)$")
+    resolution_notes: Optional[str] = None
+
+
+class DisputeOut(BaseModel):
+    id: uuid.UUID
+    customer_name: str
+    invoice_id: Optional[str]
+    reason: str
+    description: Optional[str]
+    disputed_amount: float
+    status: str
+    resolution_notes: Optional[str]
+    created_at: datetime
+    updated_at: datetime
+
+    model_config = {"from_attributes": True}
+
+
+# ==========================================
+# COMMUNICATION TIMELINE SCHEMAS
+# ==========================================
+
+class CommunicationLogOut(BaseModel):
+    id: uuid.UUID
+    customer_name: str
+    event_type: str
+    description: Optional[str]
+    metadata_json: Optional[str]
+    created_at: datetime
+
+    model_config = {"from_attributes": True}
 
 
 # ==========================================
@@ -114,6 +195,8 @@ class CustomerPriorityItem(BaseModel):
     invoice_count: int
     priority_score: float
     risk_tier: str  # low | medium | high | critical
+    open_disputes_count: int = 0
+    broken_promises_count: int = 0
 
 
 class HighRiskAccount(BaseModel):
@@ -131,6 +214,8 @@ class DashboardSummaryResponse(BaseModel):
     top_priorities: List[CustomerPriorityItem]
     high_risk_accounts: List[HighRiskAccount]
     recent_invoices: List[dict]
+    broken_promises_count: int = 0
+    open_disputes_count: int = 0
 
 
 # ==========================================

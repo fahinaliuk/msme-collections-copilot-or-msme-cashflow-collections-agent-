@@ -14,7 +14,9 @@ import {
   ArrowUpRight,
   TrendingUp,
   FileSpreadsheet,
-  Building
+  Building,
+  Handshake,
+  ShieldAlert
 } from "lucide-react";
 import {
   BarChart,
@@ -173,6 +175,34 @@ export default function DashboardPage() {
               </div>
             );
           })}
+        </div>
+
+        {/* 1.5 PROMISE & DISPUTE WIDGETS */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-8">
+          <Link href="/promises" className="block border border-border bg-card rounded-2xl p-5 shadow-md hover:border-emerald-500/30 transition-all">
+            <div className="flex items-center justify-between">
+              <div className="space-y-1">
+                <p className="text-xs font-bold uppercase tracking-wider text-muted-foreground">Broken Promises</p>
+                <p className="text-2xl font-extrabold text-red-500">{summary?.broken_promises_count ?? "—"}</p>
+                <p className="text-[10px] text-muted-foreground">View promise-to-pay tracker</p>
+              </div>
+              <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-red-500/10 text-red-500">
+                <Handshake size={20} />
+              </div>
+            </div>
+          </Link>
+          <Link href="/disputes" className="block border border-border bg-card rounded-2xl p-5 shadow-md hover:border-emerald-500/30 transition-all">
+            <div className="flex items-center justify-between">
+              <div className="space-y-1">
+                <p className="text-xs font-bold uppercase tracking-wider text-muted-foreground">Open Disputes</p>
+                <p className="text-2xl font-extrabold text-orange-500">{summary?.open_disputes_count ?? "—"}</p>
+                <p className="text-[10px] text-muted-foreground">View dispute management</p>
+              </div>
+              <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-orange-500/10 text-orange-500">
+                <ShieldAlert size={20} />
+              </div>
+            </div>
+          </Link>
         </div>
 
         {/* 2. CHARTS SECTION (GRID) */}

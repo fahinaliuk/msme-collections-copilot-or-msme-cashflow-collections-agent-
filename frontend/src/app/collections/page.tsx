@@ -4,18 +4,20 @@ import React, { useState, useEffect } from "react";
 import AuthGuard from "@/components/auth/AuthGuard";
 import Navbar from "@/components/layout/Navbar";
 import { dashboardAPI, remindersAPI } from "@/lib/api";
-import { 
-  Users, 
-  MessageSquare, 
-  Copy, 
-  Check, 
-  RotateCw, 
-  Phone, 
-  AlertTriangle, 
-  ChevronRight, 
+import {
+  Users,
+  MessageSquare,
+  Copy,
+  Check,
+  RotateCw,
+  Phone,
+  AlertTriangle,
+  ChevronRight,
   Calendar,
   IndianRupee,
-  FileSpreadsheet
+  FileSpreadsheet,
+  ShieldAlert,
+  Handshake
 } from "lucide-react";
 
 export default function CollectionsPage() {
@@ -221,6 +223,18 @@ export default function CollectionsPage() {
                           <FileSpreadsheet size={12} />
                           {cust.invoice_count} {cust.invoice_count === 1 ? 'inv' : 'invs'}
                         </span>
+                        {cust.open_disputes_count > 0 && (
+                          <span className="flex items-center gap-1 text-orange-500" title="Open disputes">
+                            <ShieldAlert size={12} />
+                            {cust.open_disputes_count}
+                          </span>
+                        )}
+                        {cust.broken_promises_count > 0 && (
+                          <span className="flex items-center gap-1 text-red-500" title="Broken promises">
+                            <Handshake size={12} />
+                            {cust.broken_promises_count}
+                          </span>
+                        )}
                       </div>
                     </div>
 
