@@ -4,7 +4,7 @@ from typing import List, Dict, Any, Optional
 from openai import OpenAI
 
 from backend.app.config import settings
-from backend.app.routers.auth import get_current_user
+from backend.app.utils.auth import get_current_user
 from backend.app.models.user import User
 
 router = APIRouter(prefix="/api/chat", tags=["chat"])
