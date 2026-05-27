@@ -242,6 +242,34 @@ overdue_days = max(0, today - due_date)  when outstanding > 0
 
 ---
 
+### Epic 8: AI Copilot Chatbot
+
+| ID | User story | Priority | MVP |
+|----|------------|----------|-----|
+| CHAT-01 | As a user, I can chat with an AI assistant embedded in the UI. | P0 | Yes |
+| CHAT-02 | As a user, the AI understands my current financial metrics and high-risk customers without me typing them. | P0 | Yes |
+
+**Acceptance criteria:**
+
+- `POST /api/chat` receives user message, historical context, and UI-injected financial metrics.
+- Returns AI generated text based on OpenAI LLM.
+
+---
+
+### Epic 9: Product-Led Onboarding
+
+| ID | User story | Priority | MVP |
+|----|------------|----------|-----|
+| ONB-01 | As a new user, I receive a guided tour of the application upon first login. | P1 | Yes |
+| ONB-02 | As a system, I remember if a user has completed the tour and do not show it again. | P1 | Yes |
+
+**Acceptance criteria:**
+
+- Uses `react-joyride` to highlight Sidebar, Ingest, Collections, and Chatbot.
+- State stored in `localStorage`.
+
+---
+
 ## 4. Functional requirements summary
 
 | Module | Endpoints (MVP) |
@@ -250,6 +278,7 @@ overdue_days = max(0, today - due_date)  when outstanding > 0
 | Invoices | `POST /api/invoices/upload`, `POST /api/invoices/confirm`, `GET /api/invoices` |
 | Dashboard | `GET /api/dashboard/summary`, `GET /api/dashboard/customers` |
 | Collections | `POST /api/collections/reminders/generate`, `POST /api/collections/actions` |
+| AI Chatbot | `POST /api/chat` |
 | Health | `GET /api/health` |
 
 ---

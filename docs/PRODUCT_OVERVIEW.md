@@ -88,7 +88,9 @@ A focused SaaS MVP that does **one job well**:
 - Customer priority engine and risk tiers  
 - WhatsApp reminder generator (templates; optional LLM polish)  
 - Collection action audit log  
-- Dark/light UI, responsive layout  
+- Premium SaaS UI with Sidebar and Framer Motion micro-animations
+- Context-Aware AI Chatbot for querying financial data
+- Interactive Product Tour onboarding (`react-joyride`)
 
 ### Explicitly out of scope (MVP)
 
