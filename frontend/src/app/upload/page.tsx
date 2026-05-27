@@ -2,8 +2,7 @@
 
 import React, { useState, useRef } from "react";
 import { useRouter } from "next/navigation";
-import AuthGuard from "@/components/auth/AuthGuard";
-import Navbar from "@/components/layout/Navbar";
+import DashboardLayout from "@/components/layout/DashboardLayout";
 import { invoicesAPI } from "@/lib/api";
 import { 
   UploadCloud, 
@@ -264,10 +263,9 @@ export default function IngestPage() {
   };
 
   return (
-    <AuthGuard>
-    <div className="min-h-screen bg-background">
-      <Navbar />
-      
+    <DashboardLayout>
+    <div className="bg-background">
+            
       <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
         
         {/* HEADER SECTION */}
@@ -680,6 +678,6 @@ Mehta & Sons also has invoice INV-204 for 75000 fully unpaid due 2026-05-20."
 
       </div>
     </div>
-    </AuthGuard>
+    </DashboardLayout>
   );
 }

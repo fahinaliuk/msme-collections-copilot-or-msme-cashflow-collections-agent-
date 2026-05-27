@@ -1,8 +1,7 @@
 "use client";
 
 import React, { useState, useEffect, useCallback } from "react";
-import AuthGuard from "@/components/auth/AuthGuard";
-import Navbar from "@/components/layout/Navbar";
+import DashboardLayout from "@/components/layout/DashboardLayout";
 import { worklistAPI } from "@/lib/api";
 import {
   ClipboardList,
@@ -272,10 +271,9 @@ export default function WorklistPage() {
   };
 
   return (
-    <AuthGuard>
-      <div className="min-h-screen bg-background">
-        <Navbar />
-
+    <DashboardLayout>
+      <div className="bg-background">
+        
         <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
           {/* HEADER */}
           <div className="border-b border-border pb-6 mb-8">
@@ -754,6 +752,6 @@ export default function WorklistPage() {
           </div>
         </QuickActionModal>
       </div>
-    </AuthGuard>
+    </DashboardLayout>
   );
 }

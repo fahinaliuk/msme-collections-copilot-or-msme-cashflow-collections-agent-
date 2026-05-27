@@ -2,9 +2,9 @@
 
 import React, { useEffect, useState } from "react";
 import Link from "next/link";
-import AuthGuard from "@/components/auth/AuthGuard";
-import Navbar from "@/components/layout/Navbar";
+import DashboardLayout from "@/components/layout/DashboardLayout";
 import { dashboardAPI } from "@/lib/api";
+import { motion } from "framer-motion";
 import {
   IndianRupee,
   Clock,
@@ -58,17 +58,16 @@ export default function DashboardPage() {
 
   if (loading) {
     return (
-      <AuthGuard>
-      <div className="min-h-screen bg-background">
-        <Navbar />
-        <div className="flex h-[calc(100vh-4rem)] items-center justify-center">
+      <DashboardLayout>
+      <div className="bg-background">
+                <div className="flex h-[calc(100vh-4rem)] items-center justify-center">
           <div className="flex flex-col items-center gap-3">
             <div className="h-8 w-8 animate-spin rounded-full border-4 border-emerald-500 border-t-transparent"></div>
             <p className="text-sm text-muted-foreground">Compiling collections intelligence...</p>
           </div>
         </div>
       </div>
-      </AuthGuard>
+      </DashboardLayout>
     );
   }
 
@@ -121,10 +120,9 @@ export default function DashboardPage() {
   ];
 
   return (
-    <AuthGuard>
-    <div className="min-h-screen bg-background">
-      <Navbar />
-      
+    <DashboardLayout>
+    <div className="bg-background">
+            
       <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
         
         {/* HEADER SECTION */}
@@ -158,8 +156,12 @@ export default function DashboardPage() {
           {kpiData.map((kpi, idx) => {
             const Icon = kpi.icon;
             return (
-              <div
+              <motion.div
                 key={idx}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.4, delay: idx * 0.1 }}
+                whileHover={{ y: -4, boxShadow: "0 10px 30px -10px rgba(0,0,0,0.1)" }}
                 className="glow-card bg-card border border-border rounded-2xl p-6 shadow-md shadow-slate-900/5 relative overflow-hidden"
               >
                 <div className="flex justify-between items-start">
@@ -172,16 +174,17 @@ export default function DashboardPage() {
                     <Icon size={20} />
                   </div>
                 </div>
-              </div>
+              </motion.div>
             );
           })}
         </div>
 
         {/* 1.5 PROMISE & DISPUTE WIDGETS */}
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-8">
-          <Link href="/promises" className="block border border-border bg-card rounded-2xl p-5 shadow-md hover:border-emerald-500/30 transition-all">
-            <div className="flex items-center justify-between">
-              <div className="space-y-1">
+          <motion.div whileHover={{ scale: 1.02 }} transition={{ type: "spring", stiffness: 400 }}>
+            <Link href="/promises" className="block border border-border bg-card rounded-2xl p-5 shadow-md hover:border-emerald-500/30 transition-all">
+              <div className="flex items-center justify-between">
+                <div className="space-y-1">
                 <p className="text-xs font-bold uppercase tracking-wider text-muted-foreground">Broken Promises</p>
                 <p className="text-2xl font-extrabold text-red-500">{summary?.broken_promises_count ?? "—"}</p>
                 <p className="text-[10px] text-muted-foreground">View promise-to-pay tracker</p>
@@ -191,6 +194,8 @@ export default function DashboardPage() {
               </div>
             </div>
           </Link>
+          </motion.div>
+          <motion.div whileHover={{ scale: 1.02 }} transition={{ type: "spring", stiffness: 400 }}>
           <Link href="/disputes" className="block border border-border bg-card rounded-2xl p-5 shadow-md hover:border-emerald-500/30 transition-all">
             <div className="flex items-center justify-between">
               <div className="space-y-1">
@@ -203,6 +208,7 @@ export default function DashboardPage() {
               </div>
             </div>
           </Link>
+          </motion.div>
         </div>
 
         {/* 2. CHARTS SECTION (GRID) */}
@@ -381,6 +387,6 @@ export default function DashboardPage() {
 
       </div>
     </div>
-    </AuthGuard>
+    </DashboardLayout>
   );
 }

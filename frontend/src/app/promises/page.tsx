@@ -1,8 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import AuthGuard from "@/components/auth/AuthGuard";
-import Navbar from "@/components/layout/Navbar";
+import DashboardLayout from "@/components/layout/DashboardLayout";
 import { promisesAPI } from "@/lib/api";
 import {
   Handshake,
@@ -98,10 +97,9 @@ export default function PromisesPage() {
   const filtered = statusFilter === "all" ? promises : promises.filter(p => p.status === statusFilter);
 
   return (
-    <AuthGuard>
-    <div className="min-h-screen bg-background">
-      <Navbar />
-      <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
+    <DashboardLayout>
+    <div className="bg-background">
+            <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between border-b border-border pb-6 mb-8 gap-4">
           <div>
             <h1 className="text-2xl font-bold tracking-tight text-foreground sm:text-3xl">
@@ -309,6 +307,6 @@ export default function PromisesPage() {
 
       </div>
     </div>
-    </AuthGuard>
+    </DashboardLayout>
   );
 }

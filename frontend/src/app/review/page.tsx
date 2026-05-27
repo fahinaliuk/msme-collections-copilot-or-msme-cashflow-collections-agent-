@@ -1,8 +1,7 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import AuthGuard from "@/components/auth/AuthGuard";
-import Navbar from "@/components/layout/Navbar";
+import DashboardLayout from "@/components/layout/DashboardLayout";
 import { invoicesAPI } from "@/lib/api";
 import { 
   AlertTriangle, 
@@ -71,10 +70,9 @@ export default function ReviewQueuePage() {
   const criticalCount = invoices.filter(inv => inv.confidence_score < 0.5).length;
 
   return (
-    <AuthGuard>
-      <div className="min-h-screen bg-background">
-        <Navbar />
-        
+    <DashboardLayout>
+      <div className="bg-background">
+                
         <main className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
           
           <div className="mb-8 flex flex-col md:flex-row md:items-end md:justify-between gap-4">
@@ -283,6 +281,6 @@ export default function ReviewQueuePage() {
 
         </main>
       </div>
-    </AuthGuard>
+    </DashboardLayout>
   );
 }

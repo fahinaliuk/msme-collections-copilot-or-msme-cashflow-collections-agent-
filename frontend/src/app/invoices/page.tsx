@@ -1,8 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import AuthGuard from "@/components/auth/AuthGuard";
-import Navbar from "@/components/layout/Navbar";
+import DashboardLayout from "@/components/layout/DashboardLayout";
 import { invoicesAPI } from "@/lib/api";
 import { 
   FileSpreadsheet, 
@@ -60,10 +59,9 @@ export default function InvoicesListPage() {
   });
 
   return (
-    <AuthGuard>
-    <div className="min-h-screen bg-background">
-      <Navbar />
-      
+    <DashboardLayout>
+    <div className="bg-background">
+            
       <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
         
         {/* HEADER SECTION */}
@@ -187,6 +185,6 @@ export default function InvoicesListPage() {
 
       </div>
     </div>
-    </AuthGuard>
+    </DashboardLayout>
   );
 }
