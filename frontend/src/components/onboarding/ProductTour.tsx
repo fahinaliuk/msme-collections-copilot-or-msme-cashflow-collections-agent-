@@ -17,6 +17,8 @@ export default function ProductTour() {
     if (!hasSeenTour) {
       const timer = setTimeout(() => {
         setRun(true);
+        // Instantly save to local storage so it NEVER runs again on other pages or refreshes
+        localStorage.setItem("hasSeenTour", "true");
       }, 1000);
       return () => clearTimeout(timer);
     }
