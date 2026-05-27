@@ -4,7 +4,7 @@ import React, { useState, useEffect } from "react";
 import { Step, STATUS } from "react-joyride";
 import dynamic from "next/dynamic";
 
-const Joyride = dynamic(() => import("react-joyride").then((mod) => mod.default as any), { ssr: false }) as any;
+const Joyride = dynamic(() => import("react-joyride").then((mod) => mod.Joyride as any), { ssr: false }) as any;
 
 export default function ProductTour() {
   const [run, setRun] = useState(false);
