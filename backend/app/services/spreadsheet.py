@@ -21,6 +21,10 @@ COLUMN_ALIASES: dict[str, list[str]] = {
         "bill number",
         "reference",
         "ref",
+        "glid",
+        "txn id",
+        "vch no",
+        "voucher no"
     ],
     "customer_name": [
         "customer_name",
@@ -30,6 +34,8 @@ COLUMN_ALIASES: dict[str, list[str]] = {
         "party",
         "buyer",
         "account name",
+        "accountname",
+        "particulars"
     ],
     "invoice_date": [
         "invoice_date",
@@ -38,6 +44,9 @@ COLUMN_ALIASES: dict[str, list[str]] = {
         "bill date",
         "date",
         "issue date",
+        "txndate",
+        "txn date",
+        "vch date"
     ],
     "due_date": [
         "due_date",
@@ -55,6 +64,7 @@ COLUMN_ALIASES: dict[str, list[str]] = {
         "bill amount",
         "value",
         "invoice value",
+        "debit"
     ],
     "amount_paid": [
         "amount_paid",
@@ -63,6 +73,7 @@ COLUMN_ALIASES: dict[str, list[str]] = {
         "received",
         "payment received",
         "advance",
+        "credit"
     ],
     "status": [
         "status",
