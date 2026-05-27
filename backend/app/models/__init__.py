@@ -1,6 +1,9 @@
 """MVP database models — users, uploads, invoices, customers, collection actions, promises, disputes, timeline."""
 
 from backend.app.database import Base
+from backend.app.models.ai_summary import AISummary
+from backend.app.models.audit_log import AuditLog
+from backend.app.models.cashflow_projection import CashflowProjection
 from backend.app.models.collection_action import CollectionAction
 from backend.app.models.communication_log import CommunicationLog
 from backend.app.models.customer_profile import CustomerProfile
@@ -20,4 +23,7 @@ __all__ = [
     "PromiseToPay",
     "Dispute",
     "CommunicationLog",
+    "AISummary",
+    "AuditLog",
+    "CashflowProjection",
 ]

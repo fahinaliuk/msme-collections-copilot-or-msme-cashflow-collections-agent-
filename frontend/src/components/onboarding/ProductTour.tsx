@@ -34,6 +34,8 @@ export default function ProductTour() {
     }
   };
 
+  if (!run) return null;
+
   const steps: Step[] = [
     {
       target: "body",

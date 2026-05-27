@@ -35,3 +35,6 @@ class User(Base):
     uploads = relationship("Upload", back_populates="user", cascade="all, delete-orphan")
     customer_profiles = relationship("CustomerProfile", back_populates="user", cascade="all, delete-orphan")
     collection_actions = relationship("CollectionAction", back_populates="user", cascade="all, delete-orphan")
+    ai_summaries = relationship("AISummary", back_populates="user", cascade="all, delete-orphan")
+    audit_logs = relationship("AuditLog", back_populates="user", cascade="all, delete-orphan")
+    cashflow_projections = relationship("CashflowProjection", back_populates="user", cascade="all, delete-orphan")
