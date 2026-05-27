@@ -254,9 +254,11 @@ async def confirm_invoices(
                 Invoice.invoice_id == inv.invoice_id,
             )
         )
-        all_warnings = list(warnings_list)
+        confirm_warnings: list[str] = []
+        if dup_q.scalars().first() is not None:
+            confirm_warnings.append(f"Duplicate invoice ID '{inv.invoice_id}' already exists.")
         if inv.warnings:
-            all_warnings.extend(inv.warnings)
+            confirm_warnings.extend(inv.warnings)
 
         conf_score = getattr(inv, 'extraction_confidence', 1.0)
 
@@ -275,7 +277,7 @@ async def confirm_invoices(
                 days_overdue=days_overdue,
                 customer_phone=inv.customer_phone,
                 confidence_score=conf_score,
-                validation_warnings=", ".join(all_warnings) if all_warnings else None,
+                validation_warnings=", ".join(confirm_warnings) if confirm_warnings else None,
             )
         )
 
