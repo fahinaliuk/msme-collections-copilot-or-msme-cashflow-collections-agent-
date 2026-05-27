@@ -136,6 +136,38 @@ def _infer_payment_status(invoice_amount: float, amount_paid: float, status: str
     return "Unpaid"
 
 
+def _find_header_row_and_map(df: pd.DataFrame) -> tuple[int, dict[str, str], list[str]]:
+    """Scan the first 30 rows of the dataframe to find the one that best matches our expected headers."""
+    # First, check if the actual column names are the headers
+    col_map = _build_column_map(list(df.columns))
+    required = ["invoice_id", "customer_name", "invoice_amount"]
+    missing = [field for field in required if field not in col_map]
+    if not missing:
+        return -1, col_map, list(df.columns)
+
+    best_row_idx = -1
+    best_map = {}
+    best_missing = required
+    best_columns = []
+
+    # Search through the first 30 rows
+    for idx, row in df.head(30).iterrows():
+        row_values = [str(val) if pd.notna(val) else "" for val in row.values]
+        col_map = _build_column_map(row_values)
+        missing = [field for field in required if field not in col_map]
+        
+        if len(missing) < len(best_missing):
+            best_missing = missing
+            best_map = col_map
+            best_row_idx = int(idx)
+            best_columns = row_values
+            
+        if not missing:
+            break
+            
+    return best_row_idx, best_map, best_columns
+
+
 def parse_spreadsheet(content: bytes, file_name: str) -> list[dict[str, Any]]:
     """Parse CSV or Excel bytes into normalized invoice row dictionaries."""
     suffix = file_name.rsplit(".", 1)[-1].lower() if "." in file_name else ""
@@ -150,19 +182,29 @@ def parse_spreadsheet(content: bytes, file_name: str) -> list[dict[str, Any]]:
     if df.empty:
         raise ValueError("The uploaded spreadsheet has no data rows.")
 
-    column_map = _build_column_map(list(df.columns))
-    required = ["invoice_id", "customer_name", "due_date", "invoice_amount"]
+    header_idx, column_map, new_columns = _find_header_row_and_map(df)
+    
+    required = ["invoice_id", "customer_name", "invoice_amount"]
     missing = [field for field in required if field not in column_map]
+    
     if missing:
         raise ValueError(
             "Could not find required columns: "
             + ", ".join(missing)
-            + ". Expected headers like invoice_id, customer_name, due_date, invoice_amount."
+            + ". Expected headers like invoice_id, customer_name, invoice_amount."
         )
+
+    if header_idx >= 0:
+        # We found the headers inside the data rows
+        df.columns = new_columns
+        df = df.iloc[header_idx + 1:].reset_index(drop=True)
 
     rows: list[dict[str, Any]] = []
     for idx, row in df.iterrows():
         invoice_amount = _cell_float(row, column_map.get("invoice_amount"))
+        if invoice_amount <= 0:
+            continue
+            
         amount_paid = _cell_float(row, column_map.get("amount_paid"))
         status = _infer_payment_status(
             invoice_amount,
@@ -172,7 +214,13 @@ def parse_spreadsheet(content: bytes, file_name: str) -> list[dict[str, Any]]:
 
         inv_date_raw = _cell_str(row, column_map.get("invoice_date"))
         due_date_raw = _cell_str(row, column_map.get("due_date"))
-        invoice_date = inv_date_raw.split(" ")[0] if inv_date_raw else due_date_raw.split(" ")[0]
+        
+        # Fallback logic for dates
+        if not inv_date_raw and due_date_raw:
+            inv_date_raw = due_date_raw
+            
+        invoice_date = inv_date_raw.split(" ")[0] if inv_date_raw else ""
+        due_date = due_date_raw.split(" ")[0] if due_date_raw else invoice_date
 
         invoice_id = _cell_str(row, column_map.get("invoice_id")) or f"ROW-{int(idx) + 1}"
         customer_name = _cell_str(row, column_map.get("customer_name")) or "Unknown Customer"
@@ -182,7 +230,7 @@ def parse_spreadsheet(content: bytes, file_name: str) -> list[dict[str, Any]]:
                 "invoice_id": invoice_id,
                 "customer_name": customer_name,
                 "invoice_date": invoice_date,
-                "due_date": due_date_raw.split(" ")[0] if due_date_raw else invoice_date,
+                "due_date": due_date,
                 "invoice_amount": invoice_amount,
                 "amount_paid": amount_paid,
                 "status": status,
