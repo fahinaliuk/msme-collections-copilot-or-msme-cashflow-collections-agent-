@@ -159,7 +159,7 @@ export default function CopilotChat() {
         whileHover={{ scale: 1.05 }}
         whileTap={{ scale: 0.95 }}
         onClick={() => setIsOpen(!isOpen)}
-        className="fixed bottom-6 right-6 h-14 w-14 rounded-full bg-emerald-600 text-white shadow-lg shadow-emerald-600/30 flex items-center justify-center z-50 transition-colors hover:bg-emerald-500"
+        className="tour-chat-step fixed bottom-6 right-6 h-14 w-14 rounded-full bg-emerald-600 text-white shadow-lg shadow-emerald-600/30 flex items-center justify-center z-50 transition-colors hover:bg-emerald-500"
       >
         {isOpen ? <X size={24} /> : <MessageSquare size={24} />}
       </motion.button>

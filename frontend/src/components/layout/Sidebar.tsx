@@ -101,7 +101,7 @@ export default function Sidebar() {
                   active
                     ? "bg-emerald-500/10 text-emerald-500 font-semibold"
                     : "text-muted-foreground hover:bg-muted hover:text-foreground font-medium"
-                }`}
+                } ${item.href === "/upload" ? "tour-ingest-step" : item.href === "/collections" ? "tour-priority-step" : ""}`}
                 title={collapsed ? item.name : undefined}
               >
                 <Icon size={18} className={active ? "text-emerald-500" : "text-muted-foreground group-hover:text-foreground"} />

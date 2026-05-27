@@ -152,7 +152,7 @@ export default function DashboardPage() {
         )}
 
         {/* 1. KPI CARDS SECTION */}
-        <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4 mb-8">
+        <div className="tour-dashboard-step grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4 mb-8">
           {kpiData.map((kpi, idx) => {
             const Icon = kpi.icon;
             return (

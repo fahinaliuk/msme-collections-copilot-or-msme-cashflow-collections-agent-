@@ -4,6 +4,7 @@ import React from "react";
 import Sidebar from "./Sidebar";
 import AuthGuard from "../auth/AuthGuard";
 import CopilotChat from "../chat/CopilotChat";
+import ProductTour from "../onboarding/ProductTour";
 
 export default function DashboardLayout({
   children,
@@ -12,6 +13,7 @@ export default function DashboardLayout({
 }) {
   return (
     <AuthGuard>
+      <ProductTour />
       <div className="flex min-h-screen w-full bg-background/50">
         <Sidebar />
         <main className="flex-1 overflow-x-hidden flex flex-col w-full">
