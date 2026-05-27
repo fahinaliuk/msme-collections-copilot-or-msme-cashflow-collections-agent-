@@ -385,3 +385,29 @@ async def get_review_queue(
         )
         for i in invoices
     ]
+
+
+@router.delete("/clear")
+async def clear_all_data(
+    current_user: User = Depends(get_current_user),
+    db: AsyncSession = Depends(get_db),
+):
+    """Clear all uploaded invoices, disputes, promises, and uploads for the user to reset the demo."""
+    from backend.app.models.invoice import Invoice
+    from backend.app.models.dispute import Dispute
+    from backend.app.models.promise_to_pay import PromiseToPay
+    from backend.app.models.upload import Upload
+    from backend.app.models.customer_profile import CustomerProfile
+    from backend.app.models.communication_log import CommunicationLog
+    
+    from sqlalchemy import delete
+    
+    await db.execute(delete(Invoice).where(Invoice.user_id == current_user.id))
+    await db.execute(delete(Dispute).where(Dispute.user_id == current_user.id))
+    await db.execute(delete(PromiseToPay).where(PromiseToPay.user_id == current_user.id))
+    await db.execute(delete(CommunicationLog).where(CommunicationLog.user_id == current_user.id))
+    await db.execute(delete(CustomerProfile).where(CustomerProfile.user_id == current_user.id))
+    await db.execute(delete(Upload).where(Upload.user_id == current_user.id))
+    
+    await db.commit()
+    return {"status": "success", "message": "All user demo data has been cleared successfully."}

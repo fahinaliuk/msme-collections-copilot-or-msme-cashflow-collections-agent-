@@ -131,6 +131,10 @@ export const invoicesAPI = {
     const response = await api.get("/api/invoices/review-queue", { params });
     return response.data;
   },
+  clearAll: async () => {
+    const response = await api.delete("/api/invoices/clear");
+    return response.data;
+  },
 };
 
 export const dashboardAPI = {

@@ -284,6 +284,31 @@ export default function IngestPage() {
             </p>
           </div>
           
+          {step === "upload" && (
+            <div className="flex gap-3">
+              <button
+                onClick={async () => {
+                  if (window.confirm("Are you sure you want to delete ALL demo data (invoices, disputes, promises) from your dashboard? This cannot be undone.")) {
+                    try {
+                      setLoading(true);
+                      await invoicesAPI.clearAll();
+                      alert("Demo data cleared successfully! You can now start fresh.");
+                    } catch (e) {
+                      alert("Failed to clear data.");
+                    } finally {
+                      setLoading(false);
+                    }
+                  }
+                }}
+                disabled={loading}
+                className="flex items-center gap-2 rounded-lg border border-destructive/20 bg-destructive/10 px-4 py-2.5 text-sm font-semibold text-destructive hover:bg-destructive/20 transition-all"
+              >
+                <Trash2 size={16} />
+                Clear Demo Data
+              </button>
+            </div>
+          )}
+
           {step === "preview" && (
             <div className="flex gap-3">
               <button
