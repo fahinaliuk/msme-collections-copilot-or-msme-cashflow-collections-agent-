@@ -30,12 +30,15 @@ A production-style, lightweight AI-powered financial operations and accounts rec
 
 ## MVP Core Features
 
-1. **JWT Authentication & User Isolation**: Credentials signup (`POST /api/auth/signup`), login (`POST /api/auth/login`), and authenticated profile isolation (`GET /api/auth/me`). Every database query is strictly isolated by the authenticated user's ID.
-2. **Layered Invoice Ingestion Engine**: Supports CSV, XLSX, and pasted invoice text (no OCR). Uses Pandas + flexible column matching for spreadsheets, regex heuristics for pasted text, and optional OpenAI fallback only when needed.
-3. **Spreadsheet Validation Grid**: Displays extracted receivables in an editable, real-time client-validated preview table. Highlights duplicate invoice IDs, date overlaps, blank columns, or negative amounts before committing to the database.
-4. **Interactive Executive Dashboard**: Features high-fidelity KPI metric cards (Total Receivables, Overdue Balance, Collected Amount, Overdue Ratio) and three Recharts graphs (BarChart for aging groups, AreaChart with gradients for historical daily trends, and MoM comparison charts).
-5. **Risk Priority Engine**: Computes priority as the sum of `outstanding_amount × overdue_days` per invoice, then ranks customers. Risk tiers: low, medium, high, critical.
-6. **WhatsApp Reminder drafts**: Offers tone modifications (polite, firm, urgent) and crafts immediate ready-to-copy WhatsApp reminder messages, logs copy actions in the database history, and enables clip-board copying.
+1. **JWT Authentication & User Isolation**: Credentials signup (`POST /api/auth/signup`), login (`POST /api/auth/login`), and authenticated profile isolation. Every database query is strictly isolated by the authenticated user's ID.
+2. **Layered Invoice Ingestion Engine**: Supports CSV, XLSX, and pasted invoice text (no OCR). Uses Pandas + flexible column matching for spreadsheets, regex heuristics for pasted text, and optional OpenAI fallback.
+3. **Spreadsheet Validation Grid**: Displays extracted receivables in an editable, real-time client-validated preview table. Highlights duplicate invoice IDs, date overlaps, blank columns, or negative amounts.
+4. **Interactive Executive Dashboard**: Features high-fidelity KPI metric cards (Total Receivables, Overdue Balance) and Recharts graphs (BarChart for aging groups, AreaChart with gradients for historical trends).
+5. **Risk Priority Engine**: Computes priority as the sum of `outstanding_amount × overdue_days` per invoice, then ranks customers into risk tiers (low, medium, high, critical).
+6. **WhatsApp Reminder Drafts**: Offers tone modifications (polite, firm, urgent) and crafts immediate ready-to-copy WhatsApp reminder messages, logging copy actions in the database history.
+7. **Premium SaaS UI**: Features a responsive, collapsible left-hand sidebar with native Dark/Light mode support, utilizing `framer-motion` for smooth micro-animations and physics-based interactions.
+8. **Context-Aware AI Chatbot**: A floating global chat widget that silently injects the user's real-time financial metrics and top risk accounts into the LLM system prompt, allowing users to "Chat with their data".
+9. **Interactive Guided Onboarding**: First-time users are greeted with a `react-joyride` powered step-by-step product tour that intelligently highlights core features, storing completion state in `localStorage`.
 
 ---
 
