@@ -88,32 +88,41 @@ export default function IngestPage() {
     const seenIds = new Map<string, number>();
     return rows.map((row, index) => {
       const warnings: string[] = [...(row.warnings || [])];
+      let scorePenalty = 0;
       const cleanId = row.invoice_id.trim();
       
-      if (!cleanId) warnings.push("Missing invoice ID.");
+      if (!cleanId) { warnings.push("Missing invoice ID."); scorePenalty += 0.15; }
       if (cleanId) {
         if (seenIds.has(cleanId)) {
           warnings.push(`Duplicate invoice ID in preview (also on row ${seenIds.get(cleanId)! + 1}).`);
+          scorePenalty += 0.10;
         } else {
           seenIds.set(cleanId, index);
         }
       }
-      if (!row.customer_name.trim()) warnings.push("Missing customer name.");
-      if (row.invoice_amount < 0) warnings.push("Invoice amount cannot be negative.");
-      if (row.amount_paid < 0) warnings.push("Amount paid cannot be negative.");
-      if (row.amount_paid > row.invoice_amount) warnings.push("Amount paid is greater than total invoice amount.");
+      if (!row.customer_name.trim()) { warnings.push("Missing customer name."); scorePenalty += 0.15; }
+      if (row.invoice_amount < 0) { warnings.push("Invoice amount cannot be negative."); scorePenalty += 0.20; }
+      if (row.amount_paid < 0) { warnings.push("Amount paid cannot be negative."); scorePenalty += 0.10; }
+      if (row.amount_paid > row.invoice_amount) { warnings.push("Amount paid is greater than total invoice amount."); scorePenalty += 0.05; }
       
       const invDate = new Date(row.invoice_date);
       const dueDate = new Date(row.due_date);
       
-      if (isNaN(invDate.getTime())) warnings.push("Invalid invoice date.");
-      if (isNaN(dueDate.getTime())) warnings.push("Invalid due date.");
+      if (isNaN(invDate.getTime())) { warnings.push("Invalid invoice date."); scorePenalty += 0.05; }
+      if (isNaN(dueDate.getTime())) { warnings.push("Invalid due date."); scorePenalty += 0.20; }
       if (!isNaN(invDate.getTime()) && !isNaN(dueDate.getTime()) && dueDate < invDate) {
         warnings.push("Due date is before the invoice date.");
+        scorePenalty += 0.05;
       }
+
+      // Compute new score based on original score minus penalties
+      let newScore = (row.extraction_confidence ?? 1.0) - scorePenalty;
+      newScore = Math.max(0, Math.min(1.0, newScore)); // clamp between 0 and 1
 
       return {
         ...row,
+        extraction_confidence: newScore,
+        needs_review: newScore < 0.75,
         warnings
       };
     });
