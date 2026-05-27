@@ -3,6 +3,7 @@
 import React from "react";
 import Sidebar from "./Sidebar";
 import AuthGuard from "../auth/AuthGuard";
+import CopilotChat from "../chat/CopilotChat";
 
 export default function DashboardLayout({
   children,
@@ -19,6 +20,7 @@ export default function DashboardLayout({
           </div>
         </main>
       </div>
+      <CopilotChat />
     </AuthGuard>
   );
 }

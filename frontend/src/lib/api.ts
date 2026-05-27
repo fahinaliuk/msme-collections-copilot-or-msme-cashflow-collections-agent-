@@ -148,6 +148,13 @@ export const dashboardAPI = {
   },
 };
 
+export const chatAPI = {
+  sendMessage: async (payload: { message: string, history: any[], context?: any }) => {
+    const response = await api.post("/api/chat", payload);
+    return response.data;
+  },
+};
+
 export const remindersAPI = {
   generate: async (data: { customer_name: string; outstanding_amount: number; max_days_overdue: number; tone: string }) => {
     const response = await api.post("/api/collections/reminders/generate", data);
