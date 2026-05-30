@@ -157,6 +157,8 @@ async def autopilot_collections_job() -> None:
                     )
                     dispatch_status = AutopilotStatus.PENDING
 
+                from backend.app.services.communication import add_timeline_entry
+
                 # 7. Log the collection action
                 action = CollectionAction(
                     user_id=user.id,
@@ -172,6 +174,16 @@ async def autopilot_collections_job() -> None:
                     created_at=datetime.now(timezone.utc),
                 )
                 session.add(action)
+
+                # 8. Log the event to the Customer Timeline
+                event_type = "whatsapp_sent_autopilot" if dispatch_status == AutopilotStatus.DISPATCHED else "whatsapp_failed_autopilot"
+                await add_timeline_entry(
+                    session,
+                    user.id,
+                    customer_name,
+                    event_type=event_type,
+                    description=f"Autopilot reminder {dispatch_status.value} — {tone} tone, ₹{total_outstanding:,.2f}"
+                )
 
                 if dispatch_status == AutopilotStatus.DISPATCHED:
                     total_dispatched += 1
