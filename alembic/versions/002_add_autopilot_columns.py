@@ -21,10 +21,16 @@ sent_via_enum = sa.Enum("MANUAL_COPY", "AUTOMATED_API", name="sent_via_enum")
 
 
 def upgrade() -> None:
+    # Explicitly create enum types on PostgreSQL before using them
+    bind = op.get_bind()
+    if bind.engine.name == "postgresql":
+        autopilot_status_enum.create(bind, checkfirst=True)
+        sent_via_enum.create(bind, checkfirst=True)
+
     # --- users table: add autopilot toggle ---
     with op.batch_alter_table("users") as batch_op:
         batch_op.add_column(
-            sa.Column("is_autopilot_enabled", sa.Boolean(), nullable=False, server_default=sa.text("0"))
+            sa.Column("is_autopilot_enabled", sa.Boolean(), nullable=False, server_default=sa.text("false"))
         )
 
     # --- collection_actions table: add autonomous tracking columns ---
