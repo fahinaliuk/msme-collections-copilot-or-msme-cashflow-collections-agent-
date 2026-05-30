@@ -27,6 +27,7 @@ class UserOut(BaseModel):
     email: EmailStr
     full_name: str
     business_name: Optional[str]
+    is_autopilot_enabled: bool = False
     created_at: datetime
 
     model_config = {"from_attributes": True}

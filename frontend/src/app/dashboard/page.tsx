@@ -18,6 +18,7 @@ import {
   Handshake,
   ShieldAlert
 } from "lucide-react";
+import AutopilotToggle from "@/components/dashboard/AutopilotToggle";
 import {
   BarChart,
   Bar,
@@ -135,13 +136,16 @@ export default function DashboardPage() {
               Real-time accounts receivable overview, aging breakdown, and collections priority pipelines.
             </p>
           </div>
-          <Link
-            href="/upload"
-            className="flex items-center justify-center gap-2 rounded-lg bg-emerald-600 px-4 py-2.5 text-sm font-semibold text-white shadow-lg shadow-emerald-600/20 hover:bg-emerald-500 hover:shadow-emerald-600/30 transition-all shrink-0"
-          >
-            <ArrowUpRight size={16} />
-            Ingest Ledger File
-          </Link>
+          <div className="flex items-center gap-4 shrink-0">
+            <AutopilotToggle />
+            <Link
+              href="/upload"
+              className="flex items-center justify-center gap-2 rounded-lg bg-emerald-600 px-4 py-2.5 text-sm font-semibold text-white shadow-lg shadow-emerald-600/20 hover:bg-emerald-500 hover:shadow-emerald-600/30 transition-all shrink-0"
+            >
+              <ArrowUpRight size={16} />
+              Ingest Ledger File
+            </Link>
+          </div>
         </div>
 
         {error && (

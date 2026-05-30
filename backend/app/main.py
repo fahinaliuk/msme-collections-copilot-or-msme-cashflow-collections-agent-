@@ -14,7 +14,9 @@ from slowapi.middleware import SlowAPIMiddleware
 from backend.app.config import settings, validate_production_settings
 from backend.app.database import init_db
 from backend.app.routers import auth, dashboard, disputes, invoices, promises, reminders, worklist, chat
+from backend.app.routers import user_settings
 from backend.app.utils.rate_limiter import limiter
+from backend.app.utils.scheduler import start_scheduler, stop_scheduler
 
 # ---------------------------------------------------------------------------
 # Logging
@@ -47,7 +49,15 @@ async def lifespan(app: FastAPI):
         "postgresql" if not settings.is_sqlite else "sqlite",
     )
     await init_db()
+
+    # Start the BizPilot autonomous scheduler
+    start_scheduler()
+    logger.info("BizPilot autonomous scheduler initialized.")
+
     yield
+
+    # Graceful shutdown
+    stop_scheduler()
     logger.info("Shutting down.")
 
 
@@ -118,6 +128,7 @@ app.include_router(dashboard.router)
 app.include_router(reminders.router)
 app.include_router(worklist.router)
 app.include_router(chat.router)
+app.include_router(user_settings.router)
 
 
 # ---------------------------------------------------------------------------

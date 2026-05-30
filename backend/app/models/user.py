@@ -21,6 +21,7 @@ class User(Base):
     business_name: Mapped[str] = mapped_column(String(255), nullable=True)
     role: Mapped[str] = mapped_column(String(50), default="user")  # user | admin
     is_active: Mapped[bool] = mapped_column(Boolean, default=True)
+    is_autopilot_enabled: Mapped[bool] = mapped_column(Boolean, default=False)
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), default=lambda: datetime.now(timezone.utc), nullable=False
     )

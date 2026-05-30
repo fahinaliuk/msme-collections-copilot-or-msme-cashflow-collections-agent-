@@ -196,5 +196,15 @@ export const worklistAPI = {
   },
 };
 
-export default api;
+export const settingsAPI = {
+  getSettings: async () => {
+    const response = await api.get("/api/users/settings");
+    return response.data;
+  },
+  updateSettings: async (data: { is_autopilot_enabled: boolean }) => {
+    const response = await api.patch("/api/users/settings", data);
+    return response.data;
+  },
+};
 
+export default api;

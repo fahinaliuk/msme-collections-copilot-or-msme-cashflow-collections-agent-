@@ -19,3 +19,4 @@ python-jose[cryptography]>=3.3.0
 python-dateutil>=2.9.0
 slowapi>=0.1.9
 setuptools>=72.0.0  # required by slowapi at runtime
+apscheduler>=3.10.0  # BizPilot autonomous scheduler
