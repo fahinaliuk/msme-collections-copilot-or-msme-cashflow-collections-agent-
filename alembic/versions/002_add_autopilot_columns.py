@@ -9,6 +9,7 @@ from typing import Sequence, Union
 
 from alembic import op
 import sqlalchemy as sa
+from sqlalchemy import inspect
 
 revision: str = "002"
 down_revision: Union[str, None] = "001"
@@ -27,20 +28,30 @@ def upgrade() -> None:
         autopilot_status_enum.create(bind, checkfirst=True)
         sent_via_enum.create(bind, checkfirst=True)
 
+    # Check existing columns using the inspector
+    inspector = inspect(bind)
+    
     # --- users table: add autopilot toggle ---
-    with op.batch_alter_table("users") as batch_op:
-        batch_op.add_column(
-            sa.Column("is_autopilot_enabled", sa.Boolean(), nullable=False, server_default=sa.text("false"))
-        )
+    if "users" in inspector.get_table_names():
+        users_columns = [col['name'] for col in inspector.get_columns("users")]
+        if "is_autopilot_enabled" not in users_columns:
+            with op.batch_alter_table("users") as batch_op:
+                batch_op.add_column(
+                    sa.Column("is_autopilot_enabled", sa.Boolean(), nullable=False, server_default=sa.text("false"))
+                )
 
     # --- collection_actions table: add autonomous tracking columns ---
-    with op.batch_alter_table("collection_actions") as batch_op:
-        batch_op.add_column(
-            sa.Column("autopilot_status", autopilot_status_enum, nullable=True)
-        )
-        batch_op.add_column(
-            sa.Column("sent_via", sent_via_enum, nullable=True)
-        )
+    if "collection_actions" in inspector.get_table_names():
+        action_columns = [col['name'] for col in inspector.get_columns("collection_actions")]
+        with op.batch_alter_table("collection_actions") as batch_op:
+            if "autopilot_status" not in action_columns:
+                batch_op.add_column(
+                    sa.Column("autopilot_status", autopilot_status_enum, nullable=True)
+                )
+            if "sent_via" not in action_columns:
+                batch_op.add_column(
+                    sa.Column("sent_via", sent_via_enum, nullable=True)
+                )
 
 
 def downgrade() -> None:
