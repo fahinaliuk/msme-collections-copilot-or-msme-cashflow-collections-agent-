@@ -108,6 +108,16 @@ app.add_middleware(
 # ---------------------------------------------------------------------------
 # Global exception handler
 # ---------------------------------------------------------------------------
+from backend.app.utils.scheduler import autopilot_collections_job
+
+@app.get("/api/test-autopilot")
+async def trigger_autopilot_manually():
+    """Hidden endpoint to manually trigger the daily autopilot job for testing."""
+    import asyncio
+    # Run it in the background so the request doesn't timeout if it takes long
+    asyncio.create_task(autopilot_collections_job())
+    return {"status": "success", "message": "Autopilot job triggered in the background. Check server logs."}
+
 @app.exception_handler(Exception)
 async def global_exception_handler(request: Request, exc: Exception):
     """Catch unhandled exceptions and return a safe JSON response."""
