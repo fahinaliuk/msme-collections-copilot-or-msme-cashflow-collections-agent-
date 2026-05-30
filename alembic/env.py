@@ -17,7 +17,20 @@ if config.config_file_name is not None:
     fileConfig(config.config_file_name)
 
 target_metadata = Base.metadata
-config.set_main_option("sqlalchemy.url", os.getenv("DATABASE_URL_SYNC", settings.DATABASE_URL_SYNC))
+
+def get_sync_url() -> str:
+    """Derive a synchronous database URL for Alembic migrations."""
+    raw_url = os.getenv("DATABASE_URL_SYNC") or settings.DATABASE_URL
+    
+    # SQLAlchemy 1.4+ requires postgresql:// instead of postgres://
+    if raw_url.startswith("postgres://"):
+        raw_url = raw_url.replace("postgres://", "postgresql://", 1)
+        
+    # Strip async drivers to ensure synchronous connection for Alembic
+    sync_url = raw_url.replace("+aiosqlite", "").replace("+asyncpg", "")
+    return sync_url
+
+config.set_main_option("sqlalchemy.url", get_sync_url())
 
 
 def run_migrations_offline() -> None:
