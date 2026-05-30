@@ -114,7 +114,7 @@ async def global_exception_handler(request: Request, exc: Exception):
     logger.exception("Unhandled exception on %s %s", request.method, request.url.path)
     return JSONResponse(
         status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-        content={"detail": "An unexpected server error occurred. Please try again later."},
+        content={"detail": f"An unexpected server error occurred: {str(exc)}"},
     )
 
 # ---------------------------------------------------------------------------
